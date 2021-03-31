@@ -4,16 +4,34 @@ import { Formik, Form } from "formik";
 import { Wrapper } from "../components/Wrapper";
 import { InputField } from "../components/InputField";
 import { Box, Button } from "@chakra-ui/react";
+import { useMutation } from "urql";
 
 interface registerProps {}
 
+const REGISTER_MUT = `
+mutation Register($username: String!, $password: String!){
+  register(options: {username: $username, password: $password}) {
+  	errors {
+      field
+      message
+    }
+    user {
+      username
+    }
+  }
+}
+`;
+
 // In Next js the name of the files inside pages will be routes
 const Register: React.FC<registerProps> = ({}) => {
+  const [, register] = useMutation(REGISTER_MUT); // firts parameter is info about mutation, second is the funtion name
   return (
     <Wrapper variant="small">
       <Formik
         initialValues={{ username: "", password: "" }}
-        onSubmit={(values) => console.log(values)}
+        onSubmit={(values) => {
+          return register(values);
+        }}
       >
         {({ isSubmitting }) => (
           <Form>

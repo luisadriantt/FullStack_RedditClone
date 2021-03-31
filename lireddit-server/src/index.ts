@@ -12,6 +12,7 @@ import redis from "redis"
 import session from "express-session"
 import connectRedis from "connect-redis"
 import { MyContext } from "./types";
+import cors from "cors"
 
 
 const main = async () => {
@@ -25,6 +26,11 @@ const main = async () => {
 
   const RedisStore = connectRedis(session)
   const redisClient = redis.createClient()
+
+  app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  }))
 
   // Session cookies with redis
   app.use(
@@ -56,8 +62,11 @@ const main = async () => {
     context: ({ req, res }): MyContext => ({ em: orm.em, req, res }) // pass session with req, res
   })
 
-  // Middlewares
-  apolloServer.applyMiddleware({ app })
+  // apollo midelware
+  apolloServer.applyMiddleware({
+    app,
+    cors: false
+  })
 
   // Listener
   app.listen(4000, () => {
