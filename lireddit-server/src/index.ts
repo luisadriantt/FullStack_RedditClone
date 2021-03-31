@@ -16,6 +16,7 @@ import { MyContext } from "./types";
 
 const main = async () => {
   // MickroORM config
+
   const orm = await MikroORM.init(microConfig)
   await orm.getMigrator().up(); // run the migration before anything else (create table)
 
