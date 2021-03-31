@@ -1,5 +1,12 @@
-import { Container } from "../components/Container";
+import { NavBar } from "../components/NavBar";
 
-const Index = () => <Container height="100vh"></Container>;
+const Index = () => {
+  return (
+    <>
+      <NavBar />
+      <h1>home</h1>
+    </>
+  );
+};
 
 export default Index;

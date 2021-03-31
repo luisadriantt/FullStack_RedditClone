@@ -17,9 +17,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Provider value={client}>
       <ChakraProvider resetCSS theme={theme}>
-        <DarkModeSwitch>
-          <Component {...pageProps} />
-        </DarkModeSwitch>
+        <Component {...pageProps} />
       </ChakraProvider>
     </Provider>
   );
