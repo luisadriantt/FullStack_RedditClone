@@ -7,8 +7,9 @@ import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
+import { UserResolver } from "./resolvers/user";
 
-const main = async() => {
+const main = async () => {
   // MickroORM config
   const orm = await MikroORM.init(microConfig)
   await orm.getMigrator().up(); // run the migration before anything else (create table)
@@ -19,14 +20,14 @@ const main = async() => {
   // Graphql Server
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, PostResolver],
+      resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false
     }),
     context: () => ({ em: orm.em }) // Function pased as ctx to resolvers 
   })
 
   // Middlewares
-  apolloServer.applyMiddleware({app})
+  apolloServer.applyMiddleware({ app })
 
   // Listener
   app.listen(4000, () => {
