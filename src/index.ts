@@ -8,6 +8,11 @@ import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
+import redis from "redis"
+import session from "express-session"
+import connectRedis from "connect-redis"
+import { MyContext } from "./types";
+
 
 const main = async () => {
   // MickroORM config
@@ -17,13 +22,37 @@ const main = async () => {
   // App config
   const app = express()
 
+  const RedisStore = connectRedis(session)
+  const redisClient = redis.createClient()
+
+  // Session cookies with redis
+  app.use(
+    session({
+      name: 'quid',
+      store: new RedisStore({
+        client: redisClient,
+        disableTouch: true, // Keeps session open forever
+      }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+        httpOnly: true, // Wont allow coockie access to front end 
+        sameSite: 'lax', //csrf
+        secure: __prod__ // cookie will only works in https
+      },
+      secret: "e12",
+      resave: false,
+      saveUninitialized: false
+    })
+  )
+
   // Graphql Server
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false
     }),
-    context: () => ({ em: orm.em }) // Function pased as ctx to resolvers 
+    // Function pased as context to resolvers 
+    context: ({ req, res }): MyContext => ({ em: orm.em, req, res }) // pass session with req, res
   })
 
   // Middlewares
