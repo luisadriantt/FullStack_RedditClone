@@ -39,7 +39,7 @@ const Login: React.FC<{}> = ({}) => {
               mt={4}
               isLoading={isSubmitting}
               type="submit"
-              colorScheme="green.500"
+              color="green.500"
             >
               login
             </Button>
