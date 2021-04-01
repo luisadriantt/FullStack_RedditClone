@@ -20,9 +20,9 @@ const Register: React.FC<registerProps> = ({}) => {
   return (
     <Wrapper variant="small">
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ email: "", username: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register(values);
+          const response = await register({ options: values });
           // response.data.register.errors -> if there is no data will throw an error (break the app)
           // response.data?.register.errors -> if ther is no data will throw undefine
           // optional chaining from typescript
@@ -35,9 +35,21 @@ const Register: React.FC<registerProps> = ({}) => {
       >
         {({ isSubmitting }) => (
           <Form>
-            <InputField name="username" label="username" />
+            <InputField
+              name="username"
+              placeholder="username"
+              label="username"
+            />
             <Box mt={4}>
-              <InputField name="password" label="password" type="password" />
+              <InputField name="email" placeholder="email" label="email" />
+            </Box>
+            <Box mt={4}>
+              <InputField
+                name="password"
+                placeholder="password"
+                label="password"
+                type="password"
+              />
             </Box>
             <Button
               mt={4}

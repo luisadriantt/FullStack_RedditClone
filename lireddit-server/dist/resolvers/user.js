@@ -106,7 +106,7 @@ let UserResolver = class UserResolver {
             if (!user) {
                 return {
                     errors: [{
-                            field: 'usename',
+                            field: 'usernameOrEmail',
                             message: 'user does not exist'
                         }]
                 };

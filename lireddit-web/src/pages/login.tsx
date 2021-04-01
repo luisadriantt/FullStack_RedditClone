@@ -18,9 +18,9 @@ const Login: React.FC<{}> = ({}) => {
   return (
     <Wrapper variant="small">
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await login({ options: values });
+          const response = await login(values);
           // response.data.register.errors -> if there is no data will throw an error (break the app)
           // response.data?.register.errors -> if ther is no data will throw undefine
           // optional chaining from typescript
@@ -33,9 +33,18 @@ const Login: React.FC<{}> = ({}) => {
       >
         {({ isSubmitting }) => (
           <Form>
-            <InputField name="username" label="username" />
+            <InputField
+              name="usernameOrEmail"
+              label="username or email"
+              placeholder="username or email"
+            />
             <Box mt={4}>
-              <InputField name="password" label="password" type="password" />
+              <InputField
+                name="password"
+                placeholder="password"
+                label="password"
+                type="password"
+              />
             </Box>
             <Button
               mt={4}
