@@ -13,11 +13,10 @@ import session from "express-session"
 import connectRedis from "connect-redis"
 import { MyContext } from "./types";
 import cors from "cors"
-
+import { User } from "./entities/User";
 
 const main = async () => {
   // MickroORM config
-
   const orm = await MikroORM.init(microConfig)
   await orm.getMigrator().up(); // run the migration before anything else (create table)
 
