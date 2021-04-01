@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
 import express from "express"
 import { ApolloServer } from "apollo-server-express";
@@ -35,7 +35,7 @@ const main = async () => {
   // Session cookies with redis
   app.use(
     session({
-      name: 'quid',
+      name: COOKIE_NAME,
       store: new RedisStore({
         client: redisClient,
         disableTouch: true, // Keeps session open forever

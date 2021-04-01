@@ -4,6 +4,7 @@ import { Cache, cacheExchange, QueryInput } from "@urql/exchange-graphcache";
 import { AppProps } from "next/app";
 import {
   LoginMutation,
+  LogoutMutation,
   MeDocument,
   MeQuery,
   RegisterMutation,
@@ -30,6 +31,15 @@ const client = createClient({
     cacheExchange({
       updates: {
         Mutation: {
+          logout: (_result, args, cache, info) => {
+            updateQueryWrapper<LogoutMutation, MeQuery>(
+              cache,
+              { query: MeDocument },
+              _result,
+              () => ({ me: null })
+            );
+          },
+
           login: (_result, args, cache, info) => {
             updateQueryWrapper<LoginMutation, MeQuery>(
               cache,
