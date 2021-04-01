@@ -2,9 +2,11 @@ import { MyContext } from "../types";
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
 import argon2 from "argon2"
-import { COOKIE_NAME } from "../constants";
 import { UsernamePasswordInput } from "./UsernamePasswordInput";
 import { validateRegister } from "../utils/validateRegister";
+import { sendEmail } from "../utils/sendEmail";
+import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "../constants";
+import { v4 } from "uuid";
 
 @ObjectType()
 class FieldError {
@@ -28,11 +30,83 @@ class UserResponse {
 // CRUD to mikroorm through graphql
 @Resolver()
 export class UserResolver {
-  // // Forgot password mutation
-  // @Mutation(() => Boolean)
-  // forgotPassword() {
-  //   @Ctx() { req}: MyContext
-  // }
+  // Chande password mutation
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg("token") token: string,
+    @Arg("newPassword") newPassword: string,
+    @Ctx() { redis, em, req }: MyContext
+  ): Promise<UserResponse> {
+    if (newPassword.length <= 2) {
+      return {
+        errors: [
+          {
+            field: "newPassword",
+            message: "length must be greater than 2",
+          },
+        ],
+      };
+    }
+
+    const key = FORGET_PASSWORD_PREFIX + token;
+    const userId = await redis.get(key);
+    if (!userId) {
+      return {
+        errors: [
+          {
+            field: "token",
+            message: "token expired",
+          },
+        ],
+      };
+    }
+    const userIdNum = parseInt(userId);
+    const user = await em.findOne(User, { _id: userIdNum });
+
+    if (!user) {
+      return {
+        errors: [
+          {
+            field: "token",
+            message: "user no longer exists",
+          },
+        ],
+      };
+    }
+    user.password = await argon2.hash(newPassword)
+    await em.persistAndFlush(user);
+
+    //log the user after changing the pass
+    req.session.userId = user._id
+
+    return { user }
+  }
+
+  // Forgot password mutation
+  @Mutation(() => Boolean)
+  async forgotPassword(
+    @Arg("email") email: string,
+    @Ctx() { em, redis }: MyContext) {
+    const user = await em.findOne(User, { email })
+    if (!user) {
+      return true
+    }
+    const token = v4()
+
+    await redis.set(
+      FORGET_PASSWORD_PREFIX + token,
+      user._id,
+      'ex', 1000 * 60 * 60 * 24 * 3) // token for changing the pass valid up to 3 days
+
+    await sendEmail(
+      email,
+      `<a href="http://localhost:3000/change-password/${token}">reset password</a>`,
+      'Reset password'
+    )
+
+    return true;
+  }
+
 
   // Check if user is logged from the cookie and fetch it
   @Query(() => User, { nullable: true })
