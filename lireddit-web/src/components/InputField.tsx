@@ -7,10 +7,12 @@ import {
 } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { useField } from "formik";
+import { Textarea } from "@chakra-ui/react";
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   label: string;
+  textarea?: boolean;
 };
 
 // cast string to boolean
@@ -19,6 +21,7 @@ type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
 
 export const InputField: React.FC<InputFieldProps> = ({
   label,
+  textarea,
   size, // take size out of props
   ...props
 }) => {
@@ -26,7 +29,11 @@ export const InputField: React.FC<InputFieldProps> = ({
   return (
     <FormControl isInvalid={!!error}>
       <FormLabel htmlFor={field.name}>{label}</FormLabel>
-      <Input {...field} {...props} id={field.name} />
+      {textarea ? (
+        <Textarea {...field} id={field.name} />
+      ) : (
+        <Input {...field} {...props} id={field.name} />
+      )}
       {error && <FormErrorMessage>{error}</FormErrorMessage>}
     </FormControl>
   );
