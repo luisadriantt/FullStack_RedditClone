@@ -52,7 +52,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
 
   return (
     <Flex bg="green.500" p={4}>
-      <Box ml="88%">{body}</Box>
+      <Box ml="87%">{body}</Box>
       <Spacer />
       <DarkModeSwitch />
     </Flex>

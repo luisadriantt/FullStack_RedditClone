@@ -98,6 +98,7 @@ let UserResolver = class UserResolver {
             }
             user.password = yield argon2_1.default.hash(newPassword);
             yield em.persistAndFlush(user);
+            yield redis.del(key);
             req.session.userId = user._id;
             return { user };
         });
