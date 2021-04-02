@@ -10,7 +10,7 @@ export class Post {
   _id!: number;
 
   @Field(() => String) // Graphql type
-  @Property({type: "date"})
+  @Property({ type: "date" })
   createdAt = new Date();
 
   @Field(() => String) // Graphql type
@@ -18,7 +18,7 @@ export class Post {
   updatedAt = new Date();
 
   @Field() // Graphql type
-  @Property({type: "text"})
+  @Property({ type: "text" })
   title!: string;
 
 }
