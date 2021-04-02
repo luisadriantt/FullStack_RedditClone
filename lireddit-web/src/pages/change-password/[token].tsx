@@ -22,7 +22,7 @@ import { toErrorMap } from "../../utils/toErrorMap";
 import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 
-const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
+const ChangePassword: NextPage = () => {
   const router = useRouter();
   const [, changePasword] = useChangePasswordMutation();
   const [tokenError, setTokenError] = useState("");
@@ -44,7 +44,7 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
           }
           const response = await changePasword({
             newPassword: values.newPassword,
-            token,
+            token: router.query.token === "string" ? router.query.token : "",
           });
           // // response.data.register.errors -> if there is no data will throw an error (break the app)
           // // response.data?.register.errors -> if ther is no data will throw undefine
@@ -103,13 +103,6 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
       </Formik>
     </Wrapper>
   );
-};
-
-// get any query parameters and use in the function
-ChangePassword.getInitialProps = ({ query }) => {
-  return {
-    token: query.token as string,
-  };
 };
 
 export default withUrqlClient(createUrqlClient, { ssr: false })(ChangePassword);

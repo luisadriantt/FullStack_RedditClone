@@ -1,5 +1,5 @@
-mutation CreatePost($input: PostInput) {
-  createPost(input: { title: "my new post", text: "chupalo" }) {
+mutation CreatePost($input: PostInput!) {
+  createPost(input: $input) {
     _id
     createdAt
     updatedAt

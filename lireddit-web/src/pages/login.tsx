@@ -28,7 +28,12 @@ const Login: React.FC<{}> = ({}) => {
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
-            router.push("/");
+            if (typeof router.query.next === "string") {
+              // if there is a route insede next then redirect to that route
+              router.push(router.query.next);
+            } else {
+              router.push("/");
+            }
           }
         }}
       >

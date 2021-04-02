@@ -156,7 +156,7 @@ export type ChangePasswordMutation = (
 );
 
 export type CreatePostMutationVariables = Exact<{
-  input?: Maybe<PostInput>;
+  input: PostInput;
 }>;
 
 
@@ -270,8 +270,8 @@ export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
 };
 export const CreatePostDocument = gql`
-    mutation CreatePost($input: PostInput) {
-  createPost(input: {title: "my new post", text: "chupalo"}) {
+    mutation CreatePost($input: PostInput!) {
+  createPost(input: $input) {
     _id
     createdAt
     updatedAt
