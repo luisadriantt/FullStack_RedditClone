@@ -1,31 +1,31 @@
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Column, BaseEntity } from "typeorm";
 
 // Setting up User table
 @ObjectType() // This decorator converts to a graphql type
 @Entity()
-export class User {
+export class User extends BaseEntity {
   @Field() // Graphql type (exposes to Graphql)
-  @PrimaryKey()
+  @PrimaryGeneratedColumn()
   _id!: number;
 
   @Field(() => String) // Graphql type
-  @Property({ type: "date" })
-  createdAt = new Date();
+  @CreateDateColumn()
+  createdAt: Date;
 
   @Field(() => String) // Graphql type
-  @Property({ type: "date", onUpdate: () => new Date() })
-  updatedAt = new Date();
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @Field() // Graphql type
-  @Property({ type: "text", unique: true })
+  @Column({ unique: true })
   username!: string;
 
   @Field() // Graphql type
-  @Property({ type: "text", unique: true })
+  @Column({ unique: true })
   email!: string;
 
-  @Property({ type: "text" })
+  @Column()
   password!: string;
 
 }
