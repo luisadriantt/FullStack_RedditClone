@@ -1,5 +1,14 @@
 import { Field, ObjectType } from "type-graphql";
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Column, BaseEntity } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Column,
+  BaseEntity,
+  OneToMany,
+} from "typeorm";
+import { Post } from "./Post";
 
 // Setting up User table
 @ObjectType() // This decorator converts to a graphql type
@@ -28,4 +37,6 @@ export class User extends BaseEntity {
   @Column()
   password!: string;
 
+  @OneToMany(() => Post, (post) => post.creator)
+  posts: Post[];
 }

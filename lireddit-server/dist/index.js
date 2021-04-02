@@ -29,19 +29,19 @@ const Post_1 = require("./entities/Post");
 const User_1 = require("./entities/User");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
-        type: 'postgres',
-        database: 'lireddit2',
-        username: 'postgres',
-        password: 'postgres',
+        type: "postgres",
+        database: "lireddit2",
+        username: "postgres",
+        password: "postgres",
         logging: true,
         synchronize: true,
-        entities: [Post_1.Post, User_1.User]
+        entities: [Post_1.Post, User_1.User],
     });
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
     const redis = new ioredis_1.default();
     app.use(cors_1.default({
-        origin: 'http://localhost:3000',
+        origin: "http://localhost:3000",
         credentials: true,
     }));
     app.use(express_session_1.default({
@@ -53,27 +53,27 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         cookie: {
             maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
             httpOnly: true,
-            sameSite: 'lax',
-            secure: constants_1.__prod__
+            sameSite: "lax",
+            secure: constants_1.__prod__,
         },
         secret: "e12",
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
             resolvers: [hello_1.HelloResolver, post_1.PostResolver, user_1.UserResolver],
-            validate: false
+            validate: false,
         }),
-        context: ({ req, res }) => ({ req, res, redis })
+        context: ({ req, res }) => ({ req, res, redis }),
     });
     apolloServer.applyMiddleware({
         app,
-        cors: false
+        cors: false,
     });
     app.listen(4000, () => {
         console.log("server started on localhost:4000");
     });
 });
-main().catch(err => console.log(err));
+main().catch((err) => console.log(err));
 //# sourceMappingURL=index.js.map

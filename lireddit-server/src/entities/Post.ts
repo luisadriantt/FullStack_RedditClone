@@ -1,5 +1,14 @@
 import { Field, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { User } from "./User";
 
 // Setting up table
 @ObjectType() // This decorator converts to a graphql type
@@ -13,6 +22,21 @@ export class Post extends BaseEntity {
   @CreateDateColumn()
   createdAt: Date;
 
+  @Field()
+  @Column()
+  creatorId: number;
+
+  @Field() // Graphql type
+  @Column()
+  text!: string;
+
+  @Field() // Graphql type
+  @Column({ type: "int", default: 0 })
+  points!: number;
+
+  @ManyToOne(() => User, (user) => user.posts)
+  creator: User;
+
   @Field(() => String) // Graphql type
   @UpdateDateColumn()
   updatedAt: Date;
@@ -20,5 +44,4 @@ export class Post extends BaseEntity {
   @Field() // Graphql type
   @Column()
   title!: string;
-
 }
