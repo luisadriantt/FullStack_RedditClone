@@ -60,17 +60,25 @@ let PostResolver = class PostResolver {
         return __awaiter(this, void 0, void 0, function* () {
             const realLimit = Math.min(50, limit);
             const reaLimitPlusOne = realLimit + 1;
-            const qb = typeorm_1.getConnection()
-                .getRepository(Post_1.Post)
-                .createQueryBuilder("p")
-                .orderBy('"createdAt"', "DESC")
-                .take(reaLimitPlusOne);
+            const replacements = [reaLimitPlusOne];
             if (cursor) {
-                qb.where('"createdAt" < :cursor', {
-                    cursor: new Date(parseInt(cursor)),
-                });
+                replacements.push(new Date(parseInt(cursor)));
             }
-            const posts = yield qb.getMany();
+            const posts = yield typeorm_1.getConnection().query(`
+    select p.*,
+    json_build_object(
+      '_id', u._id,
+      'username', u.username,
+      'email', u.email,
+      'createdAt', u."createdAt",
+      'updatedAt', u."updatedAt"
+      ) creator
+    from post p
+    inner join public.user u on u._id = p."creatorId"
+    ${cursor ? `where p."createdAt" < $2` : ""}
+    order by p."createdAt" DESC
+    limit $1
+    `, replacements);
             return {
                 posts: posts.slice(0, realLimit),
                 hasMore: posts.length === reaLimitPlusOne,
@@ -78,7 +86,7 @@ let PostResolver = class PostResolver {
         });
     }
     post(id) {
-        return Post_1.Post.findOne(id);
+        return Post_1.Post.findOne({ _id: id });
     }
     createPost(input, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -87,7 +95,7 @@ let PostResolver = class PostResolver {
     }
     updatePost(id, title) {
         return __awaiter(this, void 0, void 0, function* () {
-            const post = yield Post_1.Post.findOne(id);
+            const post = yield Post_1.Post.findOne({ _id: id });
             if (!post) {
                 return null;
             }
@@ -99,7 +107,7 @@ let PostResolver = class PostResolver {
     }
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield Post_1.Post.delete(id);
+            yield Post_1.Post.delete({ _id: id });
             return true;
         });
     }

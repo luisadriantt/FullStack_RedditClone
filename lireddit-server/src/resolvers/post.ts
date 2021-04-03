@@ -49,19 +49,45 @@ export class PostResolver {
     // 20 -> 21
     const realLimit = Math.min(50, limit);
     const reaLimitPlusOne = realLimit + 1;
-    const qb = getConnection()
-      .getRepository(Post)
-      .createQueryBuilder("p")
-      .orderBy('"createdAt"', "DESC")
-      .take(reaLimitPlusOne);
+    const replacements: any[] = [reaLimitPlusOne];
+
+    // const qb = getConnection()
+    //   .getRepository(Post)
+    //   .createQueryBuilder("p")
+    //   .innerJoinAndSelect("p.creator", "u", 'u.id = p."creatorId"')
+    //   .orderBy('p."createdAt"', "DESC")
+    //   .take(reaLimitPlusOne);
+
+    // if (cursor) {
+    //   qb.where('p."createdAt" < :cursor', {
+    //     cursor: new Date(parseInt(cursor)),
+    //   });
+    // }
 
     if (cursor) {
-      qb.where('"createdAt" < :cursor', {
-        cursor: new Date(parseInt(cursor)),
-      });
+      replacements.push(new Date(parseInt(cursor)));
     }
 
-    const posts = await qb.getMany();
+    const posts = await getConnection().query(
+      `
+    select p.*,
+    json_build_object(
+      '_id', u._id,
+      'username', u.username,
+      'email', u.email,
+      'createdAt', u."createdAt",
+      'updatedAt', u."updatedAt"
+      ) creator
+    from post p
+    inner join public.user u on u._id = p."creatorId"
+    ${cursor ? `where p."createdAt" < $2` : ""}
+    order by p."createdAt" DESC
+    limit $1
+    `,
+      replacements
+    );
+
+    // const posts = await qb.getMany();
 
     return {
       posts: posts.slice(0, realLimit),
@@ -72,7 +98,7 @@ export class PostResolver {
   // Returns a post or null
   @Query(() => Post, { nullable: true })
   post(@Arg("id") id: number): Promise<Post | undefined> {
-    return Post.findOne(id);
+    return Post.findOne({ _id: id });
   }
 
   // Create post
@@ -91,7 +117,7 @@ export class PostResolver {
     @Arg("id") id: number,
     @Arg("title", () => String, { nullable: true }) title: string
   ): Promise<Post | null> {
-    const post = await Post.findOne(id);
+    const post = await Post.findOne({ _id: id });
     if (!post) {
       return null;
     }
@@ -104,7 +130,7 @@ export class PostResolver {
   // Deletes a post
   @Mutation(() => Boolean)
   async deletePost(@Arg("id") id: number): Promise<Boolean> {
-    await Post.delete(id);
+    await Post.delete({ _id: id });
     return true;
   }
 }
