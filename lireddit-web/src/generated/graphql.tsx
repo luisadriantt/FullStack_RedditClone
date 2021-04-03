@@ -240,7 +240,7 @@ export type PostsQuery = (
   { __typename?: 'Query' }
   & { posts: Array<(
     { __typename?: 'Post' }
-    & Pick<Post, '_id' | 'createdAt' | 'updatedAt' | 'title'>
+    & Pick<Post, '_id' | 'createdAt' | 'updatedAt' | 'title' | 'text'>
   )> }
 );
 
@@ -352,6 +352,7 @@ export const PostsDocument = gql`
     createdAt
     updatedAt
     title
+    text
   }
 }
     `;

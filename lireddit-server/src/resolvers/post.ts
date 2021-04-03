@@ -3,11 +3,13 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Int,
   Mutation,
   Query,
   Resolver,
+  Root,
   UseMiddleware,
 } from "type-graphql";
 import { MyContext } from "../types";
@@ -23,9 +25,13 @@ class PostInput {
   text: string;
 }
 
-// CRUD to mikroorm through graphql
-@Resolver()
+// CRUD
+@Resolver(Post)
 export class PostResolver {
+  @FieldResolver(() => String)
+  textSnippet(@Root() post: Post) {
+    return post.text.slice(0, 50);
+  }
   // Return all posts
   @Query(() => [Post])
   async posts(
