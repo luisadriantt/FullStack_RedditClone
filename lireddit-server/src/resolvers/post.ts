@@ -68,6 +68,7 @@ export class PostResolver {
       replacements.push(new Date(parseInt(cursor)));
     }
 
+    // Raw query
     const posts = await getConnection().query(
       `
     select p.*,
