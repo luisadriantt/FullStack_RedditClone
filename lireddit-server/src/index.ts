@@ -31,6 +31,8 @@ const main = async () => {
 
   await conn.runMigrations();
 
+  // await Post.delete({});
+
   // App config
   const app = express();
 
