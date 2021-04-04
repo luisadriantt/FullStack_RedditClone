@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from "typeorm";
 import { Post } from "./Post";
+import { UserPost } from "./UserPost";
 
 // Setting up User table
 @ObjectType() // This decorator converts to a graphql type
@@ -39,4 +40,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Post, (post) => post.creator)
   posts: Post[];
+
+  @OneToMany(() => UserPost, (userPost) => userPost.user)
+  userPosts: UserPost[];
 }

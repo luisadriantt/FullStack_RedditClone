@@ -5,10 +5,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User";
+import { UserPost } from "./UserPost";
 
 // Setting up table
 @ObjectType() // This decorator converts to a graphql type
@@ -37,6 +39,9 @@ export class Post extends BaseEntity {
   @Field()
   @ManyToOne(() => User, (user) => user.posts)
   creator: User;
+
+  @OneToMany(() => UserPost, (userPost) => userPost.post)
+  userPosts: UserPost[];
 
   @Field(() => String) // Graphql type
   @UpdateDateColumn()

@@ -36,6 +36,37 @@ class PaginatedPosts {
 // CRUD
 @Resolver(Post)
 export class PostResolver {
+  // Vote mutation
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() { req }: MyContext
+  ) {
+    const isUpdoot = value !== -1;
+    const realValue = isUpdoot ? 1 : -1;
+    const { userId } = req.session;
+    // await Updoot.insert({
+    //   userId,
+    //   postId,
+    //   value: realValue,
+    // });
+    await getConnection().query(
+      `
+    START TRANSACTION;
+    insert into user_post ("userId", "postId", value)
+    values (${userId},${postId},${realValue});
+    update post
+    set points = points + ${realValue}
+    where _id = ${postId};
+    COMMIT;
+    `
+    );
+    return true;
+  }
+
+  // Return only 50 firts characters of post text
   @FieldResolver(() => String)
   textSnippet(@Root() post: Post) {
     return post.text.slice(0, 50);
