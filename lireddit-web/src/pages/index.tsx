@@ -9,11 +9,14 @@ import {
   Button,
   Flex,
   Heading,
+  IconButton,
   Link,
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
+import { PostVotes } from "../components/PostVotes";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -44,15 +47,18 @@ const Index = () => {
       ) : (
         <Stack spacing={8}>
           {data!.posts.posts.map((post) => (
-            <Box key={post._id} p={5} shadow="md" borderWidth="1px">
-              <Heading fontSize="xl">{post.title}</Heading>
-              <Text color="gray.500" fontSize="xs" fontFamily="unset">
-                posted by {post.creator.username}
-              </Text>
-              <Text mt={4} alignContent="center">
-                {post.text.slice(0, 50)}...
-              </Text>
-            </Box>
+            <Flex key={post._id} p={5} shadow="md" borderWidth="1px">
+              <PostVotes post={post} />
+              <Box>
+                <Heading fontSize="xl">{post.title}</Heading>
+                <Text color="gray.500" fontSize="xs" fontFamily="unset">
+                  posted by {post.creator.username}
+                </Text>
+                <Text mt={4} alignContent="center">
+                  {post.textSnippet.slice(0, 50)}...
+                </Text>
+              </Box>
+            </Flex>
           ))}
         </Stack>
       )}
