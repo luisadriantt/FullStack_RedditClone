@@ -9,12 +9,10 @@ import {
   Button,
   Flex,
   Heading,
-  IconButton,
   Link,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import { PostVotes } from "../components/PostVotes";
 
