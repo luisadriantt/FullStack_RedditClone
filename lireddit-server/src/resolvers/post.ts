@@ -115,7 +115,6 @@ export class PostResolver {
     // 20 -> 21
     const realLimit = Math.min(50, limit);
     const reaLimitPlusOne = realLimit + 1;
-    const replacements: any[] = [reaLimitPlusOne, req.session.userId];
 
     // const qb = getConnection()
     //   .getRepository(Post)
@@ -130,8 +129,16 @@ export class PostResolver {
     //   });
     // }
 
+    const replacements: any[] = [reaLimitPlusOne];
+
+    if (req.session.userId) {
+      replacements.push(req.session.userId);
+    }
+
+    let cursorIdx = 3;
     if (cursor) {
       replacements.push(new Date(parseInt(cursor)));
+      cursorIdx = replacements.length;
     }
 
     // Raw query
@@ -152,7 +159,7 @@ export class PostResolver {
     }
     from post p
     inner join public.user u on u._id = p."creatorId"
-    ${cursor ? `where p."createdAt" < $3` : ""}
+    ${cursor ? `where p."createdAt" < $${cursorIdx}` : ""}
     order by p."createdAt" DESC
     limit $1
     `,
