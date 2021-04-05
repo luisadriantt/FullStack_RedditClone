@@ -15,12 +15,15 @@ export const PostVotes: React.FC<PostVotesProps> = ({ post }) => {
   return (
     <Flex direction="column" justifyContent="center" alignItems="center" mr={4}>
       <IconButton
-        variant="ghost"
+        variant={post.voteStatus === 1 ? "outline" : "ghost"}
         colorScheme="green"
         size="sm"
         aria-label="up vote"
         icon={<ChevronUpIcon />}
         onClick={async () => {
+          if (post.voteStatus === 1) {
+            return;
+          }
           await vote({
             postId: post._id,
             value: 1,
@@ -31,12 +34,15 @@ export const PostVotes: React.FC<PostVotesProps> = ({ post }) => {
       />
       <Text fontSize="sm">{post.points}</Text>
       <IconButton
-        variant="ghost"
-        colorScheme="green"
+        variant={post.voteStatus === -1 ? "outline" : "ghost"}
+        colorScheme="red"
         size="sm"
         aria-label="down vote"
         icon={<ChevronDownIcon />}
         onClick={async () => {
+          if (post.voteStatus === -1) {
+            return;
+          }
           await vote({
             postId: post._id,
             value: -1,
