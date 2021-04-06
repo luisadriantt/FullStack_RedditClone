@@ -1,23 +1,20 @@
 import React from "react";
 import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../../utils/createUrqlClient";
-import { useRouter } from "next/router";
 import { Layout } from "../../components/Layout";
-import { Heading, Box, Flex, IconButton, Spacer } from "@chakra-ui/react";
-import { useDeletePostMutation, usePostQuery } from "../../generated/graphql";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { Heading, Box, Flex, Spacer } from "@chakra-ui/react";
+import { usePostQuery } from "../../generated/graphql";
+import { useGetIntId } from "../../utils/useGetIntId";
+import { EditDeletePostButtons } from "../../components/EditDeletePostButtons";
 
 const Post = ({}) => {
-  const router = useRouter();
-  const intId =
-    typeof router.query.id === "string" ? parseInt(router.query.id) : -1;
+  const intId = useGetIntId();
   const [{ data, error, fetching }] = usePostQuery({
     pause: intId === -1,
     variables: {
       id: intId,
     },
   });
-  const [, deletePost] = useDeletePostMutation();
 
   if (fetching) {
     return (
@@ -44,16 +41,9 @@ const Post = ({}) => {
       <Flex direction="row" align="center">
         <Heading mb={4}>{data.post.title}</Heading>
         <Spacer />
-        <IconButton
-          variant="ghost"
-          colorScheme="green"
-          size="sm"
-          aria-label="Delete post"
-          icon={<DeleteIcon />}
-          onClick={async () => {
-            await deletePost({ id: data.post?._id as number });
-            router.push("/");
-          }}
+        <EditDeletePostButtons
+          postId={data.post._id}
+          creatorId={data.post.creator._id as number}
         />
       </Flex>
       {data.post.text}

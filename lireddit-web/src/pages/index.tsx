@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { PostVotes } from "../components/PostVotes";
+import { EditDeletePostButtons } from "../components/EditDeletePostButtons";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -40,7 +41,7 @@ const Index = () => {
             !post ? null : (
               <Flex key={post._id} p={5} shadow="md" borderWidth="1px">
                 <PostVotes post={post} />
-                <Box>
+                <Box flex={1}>
                   <NextLink href="/post/[id]" as={`/post/${post._id}`}>
                     <Link>
                       <Heading fontSize="xl">{post.title}</Heading>
@@ -49,9 +50,17 @@ const Index = () => {
                   <Text color="gray.500" fontSize="xs" fontFamily="unset">
                     posted by {post.creator.username}
                   </Text>
-                  <Text mt={4} alignContent="center">
-                    {post.textSnippet.slice(0, 50)}...
-                  </Text>
+                  <Flex align="center">
+                    <Text mt={5} alignContent="center">
+                      {post.textSnippet.slice(0, 50)}...
+                    </Text>
+                    <Box ml="auto">
+                      <EditDeletePostButtons
+                        postId={post._id}
+                        creatorId={post.creator._id}
+                      />
+                    </Box>
+                  </Flex>
                 </Box>
               </Flex>
             )
