@@ -4,17 +4,15 @@ import DataLoader from "dataloader";
 // Dataloader: batch several request into a single sql statment
 // [{postId: 5, userId: 10}]
 // [{postId: 5, userId: 10, value: 1}]
-export const createUpdootLoader = () =>
+export const createVotesLoader = () =>
   new DataLoader<{ postId: number; userId: number }, UserPost | null>(
     async (keys) => {
-      const updoots = await UserPost.findByIds(keys as any);
-      const updootIdsToUpdoot: Record<string, UserPost> = {};
-      updoots.forEach((updoot) => {
-        updootIdsToUpdoot[`${updoot.userId}|${updoot.postId}`] = updoot;
+      const votes = await UserPost.findByIds(keys as any);
+      const voteIdsToVote: Record<string, UserPost> = {};
+      votes.forEach((vote) => {
+        voteIdsToVote[`${vote.userId}|${vote.postId}`] = vote;
       });
 
-      return keys.map(
-        (key) => updootIdsToUpdoot[`${key.userId}|${key.postId}`]
-      );
+      return keys.map((key) => voteIdsToVote[`${key.userId}|${key.postId}`]);
     }
   );

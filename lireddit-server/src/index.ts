@@ -17,6 +17,7 @@ import { User } from "./entities/User";
 import path from "path";
 import { UserPost } from "./entities/UserPost";
 import { createUserLoader } from "./utils/createUserLoader";
+import { createVotesLoader } from "./utils/createVotesLoader";
 
 const main = async () => {
   // Typeorm conf
@@ -80,6 +81,7 @@ const main = async () => {
       res,
       redis,
       userLoader: createUserLoader(), // Batch and cache loading of users within a singel request
+      votesLoader: createVotesLoader(),
     }), // pass session with req, res, redis, userLoader
   });
 

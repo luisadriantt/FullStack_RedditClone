@@ -12,16 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUpdootLoader = void 0;
+exports.createVotesLoader = void 0;
 const UserPost_1 = require("../entities/UserPost");
 const dataloader_1 = __importDefault(require("dataloader"));
-const createUpdootLoader = () => new dataloader_1.default((keys) => __awaiter(void 0, void 0, void 0, function* () {
-    const updoots = yield UserPost_1.UserPost.findByIds(keys);
-    const updootIdsToUpdoot = {};
-    updoots.forEach((updoot) => {
-        updootIdsToUpdoot[`${updoot.userId}|${updoot.postId}`] = updoot;
+const createVotesLoader = () => new dataloader_1.default((keys) => __awaiter(void 0, void 0, void 0, function* () {
+    const votes = yield UserPost_1.UserPost.findByIds(keys);
+    const voteIdsToVote = {};
+    votes.forEach((vote) => {
+        voteIdsToVote[`${vote.userId}|${vote.postId}`] = vote;
     });
-    return keys.map((key) => updootIdsToUpdoot[`${key.userId}|${key.postId}`]);
+    return keys.map((key) => voteIdsToVote[`${key.userId}|${key.postId}`]);
 }));
-exports.createUpdootLoader = createUpdootLoader;
+exports.createVotesLoader = createVotesLoader;
 //# sourceMappingURL=createVotesLoader.js.map

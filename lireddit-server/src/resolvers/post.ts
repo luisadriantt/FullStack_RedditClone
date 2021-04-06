@@ -100,7 +100,7 @@ export class PostResolver {
     }
     return true;
   }
-
+  // Field resolvers only fetch the data when its included inside a graphql query!!!
   // Return only 50 firts characters of post text
   @FieldResolver(() => String)
   textSnippet(@Root() post: Post) {
@@ -110,6 +110,20 @@ export class PostResolver {
   @FieldResolver(() => User)
   creator(@Root() post: Post, @Ctx() { userLoader }: MyContext) {
     return userLoader.load(post.creatorId);
+  }
+
+  @FieldResolver(() => Int, { nullable: true })
+  async voteStatus(@Root() post: Post, @Ctx() { votesLoader, req }: MyContext) {
+    if (!req.session.userId) {
+      return null;
+    }
+
+    const vote = await votesLoader.load({
+      postId: post._id,
+      userId: req.session.userId,
+    });
+
+    return vote ? vote.value : null;
   }
 
   // Return all posts
@@ -138,28 +152,16 @@ export class PostResolver {
 
     const replacements: any[] = [reaLimitPlusOne];
 
-    if (req.session.userId) {
-      replacements.push(req.session.userId);
-    }
-
-    let cursorIdx = 3;
     if (cursor) {
       replacements.push(new Date(parseInt(cursor)));
-      cursorIdx = replacements.length;
     }
 
     // Raw query
     const posts = await getConnection().query(
       `
-    select p.*,
-
-    ${
-      req.session.userId
-        ? '(select value from user_post where "userId" = $2 and "postId" = p._id) "voteStatus"'
-        : 'null as "voteStatus"'
-    }
+    select p.*
     from post p
-    ${cursor ? `where p."createdAt" < $${cursorIdx}` : ""}
+    ${cursor ? `where p."createdAt" < $2` : ""}
     order by p."createdAt" DESC
     limit $1
     `,
