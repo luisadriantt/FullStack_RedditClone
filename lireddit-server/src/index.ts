@@ -16,6 +16,7 @@ import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 import path from "path";
 import { UserPost } from "./entities/UserPost";
+import { createUserLoader } from "./utils/createUserLoader";
 
 const main = async () => {
   // Typeorm conf
@@ -74,7 +75,12 @@ const main = async () => {
       validate: false,
     }),
     // Function pased as context to resolvers
-    context: ({ req, res }): MyContext => ({ req, res, redis }), // pass session with req, res
+    context: ({ req, res }): MyContext => ({
+      req,
+      res,
+      redis,
+      userLoader: createUserLoader(), // Batch and cache loading of users within a singel request
+    }), // pass session with req, res, redis, userLoader
   });
 
   // apollo midelware

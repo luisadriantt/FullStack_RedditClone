@@ -106,6 +106,12 @@ export class PostResolver {
   textSnippet(@Root() post: Post) {
     return post.text.slice(0, 50);
   }
+
+  @FieldResolver(() => User)
+  creator(@Root() post: Post, @Ctx() { userLoader }: MyContext) {
+    return userLoader.load(post.creatorId);
+  }
+
   // Return all posts
   @Query(() => PaginatedPosts)
   async posts(
@@ -146,20 +152,13 @@ export class PostResolver {
     const posts = await getConnection().query(
       `
     select p.*,
-    json_build_object(
-      '_id', u._id,
-      'username', u.username,
-      'email', u.email,
-      'createdAt', u."createdAt",
-      'updatedAt', u."updatedAt"
-      ) creator,
+
     ${
       req.session.userId
         ? '(select value from user_post where "userId" = $2 and "postId" = p._id) "voteStatus"'
         : 'null as "voteStatus"'
     }
     from post p
-    inner join public.user u on u._id = p."creatorId"
     ${cursor ? `where p."createdAt" < $${cursorIdx}` : ""}
     order by p."createdAt" DESC
     limit $1
@@ -178,7 +177,7 @@ export class PostResolver {
   // Returns a post or null
   @Query(() => Post, { nullable: true })
   async post(@Arg("id", () => Int) id: number): Promise<Post | undefined> {
-    return await Post.findOne(id, { relations: ["creator"] });
+    return await Post.findOne(id);
   }
 
   // Create post

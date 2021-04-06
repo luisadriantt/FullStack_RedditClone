@@ -22,12 +22,16 @@ const Index = () => {
     limit: 15,
     cursor: null as null | string,
   });
-  const [{ data, fetching }] = usePostsQuery({
+  const [{ data, error, fetching }] = usePostsQuery({
     variables,
   });
 
   if (!fetching && !data) {
-    return <Heading> Something went wrong </Heading>;
+    return (
+      <>
+        <Heading> Something went wrong </Heading> <div>{error?.message}</div>
+      </>
+    );
   }
 
   // At delete (not cascade way), post get to a null value, so thats why !post ? null :

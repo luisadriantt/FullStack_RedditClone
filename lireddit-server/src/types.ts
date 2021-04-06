@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Session, SessionData } from "express-session";
-import Redis from "ioredis"
+import Redis from "ioredis";
+import { createUserLoader } from "./utils/createUserLoader";
 
 // create type alias for context
 export type MyContext = {
@@ -8,5 +9,6 @@ export type MyContext = {
     session: Session & Partial<SessionData> & { userId?: number };
   };
   res: Response;
-  redis: Redis.Redis
-}
+  redis: Redis.Redis;
+  userLoader: ReturnType<typeof createUserLoader>;
+};
