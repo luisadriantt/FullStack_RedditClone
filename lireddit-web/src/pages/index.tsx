@@ -29,30 +29,33 @@ const Index = () => {
     return <Heading> Something went wrong </Heading>;
   }
 
+  // At delete (not cascade way), post get to a null value, so thats why !post ? null :
   return (
     <Layout>
       {!data && fetching ? (
         <div>loading...</div>
       ) : (
         <Stack spacing={8}>
-          {data!.posts.posts.map((post) => (
-            <Flex key={post._id} p={5} shadow="md" borderWidth="1px">
-              <PostVotes post={post} />
-              <Box>
-                <NextLink href="/post/[id]" as={`/post/${post._id}`}>
-                  <Link>
-                    <Heading fontSize="xl">{post.title}</Heading>
-                  </Link>
-                </NextLink>
-                <Text color="gray.500" fontSize="xs" fontFamily="unset">
-                  posted by {post.creator.username}
-                </Text>
-                <Text mt={4} alignContent="center">
-                  {post.textSnippet.slice(0, 50)}...
-                </Text>
-              </Box>
-            </Flex>
-          ))}
+          {data!.posts.posts.map((post) =>
+            !post ? null : (
+              <Flex key={post._id} p={5} shadow="md" borderWidth="1px">
+                <PostVotes post={post} />
+                <Box>
+                  <NextLink href="/post/[id]" as={`/post/${post._id}`}>
+                    <Link>
+                      <Heading fontSize="xl">{post.title}</Heading>
+                    </Link>
+                  </NextLink>
+                  <Text color="gray.500" fontSize="xs" fontFamily="unset">
+                    posted by {post.creator.username}
+                  </Text>
+                  <Text mt={4} alignContent="center">
+                    {post.textSnippet.slice(0, 50)}...
+                  </Text>
+                </Box>
+              </Flex>
+            )
+          )}
         </Stack>
       )}
       {data && data.posts.hasMore ? (

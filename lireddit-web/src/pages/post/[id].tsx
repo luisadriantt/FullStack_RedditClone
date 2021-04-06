@@ -3,8 +3,9 @@ import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 import { useRouter } from "next/router";
 import { Layout } from "../../components/Layout";
-import { Heading, Box } from "@chakra-ui/react";
-import { usePostQuery } from "../../generated/graphql";
+import { Heading, Box, Flex, IconButton, Spacer } from "@chakra-ui/react";
+import { useDeletePostMutation, usePostQuery } from "../../generated/graphql";
+import { DeleteIcon } from "@chakra-ui/icons";
 
 const Post = ({}) => {
   const router = useRouter();
@@ -16,6 +17,7 @@ const Post = ({}) => {
       id: intId,
     },
   });
+  const [, deletePost] = useDeletePostMutation();
 
   if (fetching) {
     return (
@@ -39,7 +41,21 @@ const Post = ({}) => {
 
   return (
     <Layout>
-      <Heading mb={4}>{data.post.title}</Heading>
+      <Flex direction="row" align="center">
+        <Heading mb={4}>{data.post.title}</Heading>
+        <Spacer />
+        <IconButton
+          variant="ghost"
+          colorScheme="green"
+          size="sm"
+          aria-label="Delete post"
+          icon={<DeleteIcon />}
+          onClick={async () => {
+            await deletePost({ id: data.post?._id as number });
+            router.push("/");
+          }}
+        />
+      </Flex>
       {data.post.text}
     </Layout>
   );
