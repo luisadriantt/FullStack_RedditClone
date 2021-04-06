@@ -4,7 +4,7 @@ import {
   fetchExchange,
   stringifyVariables,
 } from "urql";
-import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
+import { cacheExchange, Resolver, Cache } from "@urql/exchange-graphcache";
 import { pipe, tap } from "wonka";
 import Router from "next/router";
 
@@ -66,6 +66,14 @@ const cursorPagination = (): Resolver => {
   };
 };
 
+function invalidateAllPosts(cache: Cache) {
+  const allFields = cache.inspectFields("Query");
+  const fieldInfos = allFields.filter((info) => info.fieldName === "posts");
+  fieldInfos.forEach((fi) => {
+    cache.invalidate("Query", "posts", fi.arguments || {});
+  });
+}
+
 // ssr -- first time we go on a page its gonna ssr
 //     browser -> next.js -> graphql api
 // client side -- when browser make a request its gonna auto send the cookies
@@ -106,7 +114,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
                 id: (args as DeletePostMutationVariables).id,
               });
             },
-            vote: (_result, args, cache, info) => {
+            vote: (_result, args, cache, _) => {
               const { postId, value } = args as VoteMutationVariables;
               const data = cache.readFragment(
                 gql`
@@ -137,16 +145,10 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
               }
             },
             // invalidate the cache and refetch the data from the the query
-            createPost: (_result, args, cache, info) => {
-              const allFields = cache.inspectFields("Query");
-              const fieldInfos = allFields.filter(
-                (info) => info.fieldName === "posts"
-              );
-              fieldInfos.forEach((fi) => {
-                cache.invalidate("Query", "posts", fi.arguments || {});
-              });
+            createPost: (_result, _, cache, __) => {
+              invalidateAllPosts(cache);
             },
-            logout: (_result, args, cache, info) => {
+            logout: (_result, _, cache, __) => {
               updateQueryWrapper<LogoutMutation, MeQuery>(
                 cache,
                 { query: MeDocument },
@@ -155,7 +157,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
               );
             },
 
-            login: (_result, args, cache, info) => {
+            login: (_result, _, cache, __) => {
               updateQueryWrapper<LoginMutation, MeQuery>(
                 cache,
                 { query: MeDocument },
@@ -170,8 +172,9 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
                   }
                 }
               );
+              invalidateAllPosts(cache);
             },
-            register: (_result, args, cache, info) => {
+            register: (_result, _, cache, __) => {
               updateQueryWrapper<RegisterMutation, MeQuery>(
                 cache,
                 { query: MeDocument },

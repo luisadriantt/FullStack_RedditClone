@@ -10,6 +10,7 @@ import {
   Heading,
   Text,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { DarkModeSwitch } from "./DarkModeSwitch";
@@ -18,6 +19,7 @@ import { isServer } from "../utils/isServer";
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
+  const router = useRouter();
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   const [{ data, fetching }] = useMeQuery({
     pause: isServer(), // dont run the request in the server
@@ -52,8 +54,9 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
           <Text color="twitter.300">{data.me.username}</Text>
         </Box>
         <Button
-          onClick={() => {
-            logout();
+          onClick={async () => {
+            await logout();
+            router.reload();
           }}
           isLoading={logoutFetching}
           color="white"
