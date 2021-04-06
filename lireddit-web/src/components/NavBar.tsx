@@ -1,7 +1,15 @@
 import React from "react";
 
 import NextLink from "next/link"; // server side routing
-import { Box, Flex, Link, Spacer, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Link,
+  Spacer,
+  Button,
+  Heading,
+  Text,
+} from "@chakra-ui/react";
 
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { DarkModeSwitch } from "./DarkModeSwitch";
@@ -35,13 +43,20 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   } else {
     body = (
       <Flex>
-        <Box mr={2}>{data.me.username}</Box>
+        <NextLink href="/create-post">
+          <Button color="white" variant="link">
+            create post
+          </Button>
+        </NextLink>
+        <Box mr={2} ml={2}>
+          <Text color="twitter.300">{data.me.username}</Text>
+        </Box>
         <Button
           onClick={() => {
             logout();
           }}
           isLoading={logoutFetching}
-          color="green.700"
+          color="white"
           variant="link"
         >
           logout
@@ -51,8 +66,22 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   }
 
   return (
-    <Flex zIndex={1} position="sticky" top={0} bg="green.500" p={4}>
-      <Box ml="87%">{body}</Box>
+    <Flex
+      zIndex={1}
+      position="sticky"
+      top={0}
+      bg="green.500"
+      p={4}
+      align="center"
+    >
+      <NextLink href="/">
+        <Link>
+          <Heading color="white">lireddit</Heading>
+        </Link>
+      </NextLink>
+      <Box ml="79%" mt="25px">
+        {body}
+      </Box>
       <Spacer />
       <DarkModeSwitch />
     </Flex>

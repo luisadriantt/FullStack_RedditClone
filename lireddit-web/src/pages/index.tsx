@@ -31,15 +31,6 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex align="center">
-        <Heading color="green">LiReddit</Heading>
-        <NextLink href="/create-post">
-          <Link ml="auto" color="teal.500" href="#">
-            create post
-          </Link>
-        </NextLink>
-      </Flex>
-      <br></br>
       {!data && fetching ? (
         <div>loading...</div>
       ) : (
@@ -48,7 +39,11 @@ const Index = () => {
             <Flex key={post._id} p={5} shadow="md" borderWidth="1px">
               <PostVotes post={post} />
               <Box>
-                <Heading fontSize="xl">{post.title}</Heading>
+                <NextLink href="/post/[id]" as={`/post/${post._id}`}>
+                  <Link>
+                    <Heading fontSize="xl">{post.title}</Heading>
+                  </Link>
+                </NextLink>
                 <Text color="gray.500" fontSize="xs" fontFamily="unset">
                   posted by {post.creator.username}
                 </Text>

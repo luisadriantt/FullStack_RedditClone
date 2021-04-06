@@ -41,6 +41,7 @@ export type MutationVoteArgs = {
 
 
 export type MutationCreatePostArgs = {
+  creator: Scalars['Int'];
   input: PostInput;
 };
 
@@ -118,7 +119,7 @@ export type QueryPostsArgs = {
 
 
 export type QueryPostArgs = {
-  id: Scalars['Float'];
+  id: Scalars['Int'];
 };
 
 export type User = {
@@ -188,6 +189,7 @@ export type ChangePasswordMutation = (
 
 export type CreatePostMutationVariables = Exact<{
   input: PostInput;
+  creator: Scalars['Int'];
 }>;
 
 
@@ -252,6 +254,23 @@ export type MeQuery = (
   & { me?: Maybe<(
     { __typename?: 'User' }
     & UserFieldsFragment
+  )> }
+);
+
+export type PostQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type PostQuery = (
+  { __typename?: 'Query' }
+  & { post?: Maybe<(
+    { __typename?: 'Post' }
+    & Pick<Post, '_id' | 'createdAt' | 'updatedAt' | 'title' | 'points' | 'text' | 'voteStatus'>
+    & { creator: (
+      { __typename?: 'User' }
+      & Pick<User, '_id' | 'username'>
+    ) }
   )> }
 );
 
@@ -334,8 +353,8 @@ export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
 };
 export const CreatePostDocument = gql`
-    mutation CreatePost($input: PostInput!) {
-  createPost(input: $input) {
+    mutation CreatePost($input: PostInput!, $creator: Int!) {
+  createPost(input: $input, creator: $creator) {
     _id
     createdAt
     updatedAt
@@ -399,6 +418,27 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const PostDocument = gql`
+    query Post($id: Int!) {
+  post(id: $id) {
+    _id
+    createdAt
+    updatedAt
+    title
+    points
+    text
+    voteStatus
+    creator {
+      _id
+      username
+    }
+  }
+}
+    `;
+
+export function usePostQuery(options: Omit<Urql.UseQueryArgs<PostQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PostQuery>({ query: PostDocument, ...options });
 };
 export const PostsDocument = gql`
     query Posts($limit: Int!, $cursor: String) {

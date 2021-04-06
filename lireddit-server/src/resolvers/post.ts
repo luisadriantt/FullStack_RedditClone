@@ -1,4 +1,5 @@
 import { Post } from "../entities/Post";
+import { User } from "../entities/User";
 import {
   Arg,
   Ctx,
@@ -176,8 +177,8 @@ export class PostResolver {
 
   // Returns a post or null
   @Query(() => Post, { nullable: true })
-  post(@Arg("id") id: number): Promise<Post | undefined> {
-    return Post.findOne({ _id: id });
+  async post(@Arg("id", () => Int) id: number): Promise<Post | undefined> {
+    return await Post.findOne(id, { relations: ["creator"] });
   }
 
   // Create post
@@ -185,9 +186,15 @@ export class PostResolver {
   @UseMiddleware(isAuth)
   async createPost(
     @Arg("input") input: PostInput,
+    @Arg("creator", () => Int) creator: number,
     @Ctx() { req }: MyContext
   ): Promise<Post> {
-    return Post.create({ ...input, creatorId: req.session.userId }).save();
+    const user = await User.findOne(creator);
+    return Post.create({
+      ...input,
+      creatorId: req.session.userId,
+      creator: user,
+    }).save();
   }
 
   // Update post
