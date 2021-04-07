@@ -31,6 +31,7 @@ const main = async () => {
     entities: [Post, User, UserPost],
   });
 
+  console.log("lurs ", process.env.DATABASE_URL);
   await conn.runMigrations();
 
   // await Post.delete({});
