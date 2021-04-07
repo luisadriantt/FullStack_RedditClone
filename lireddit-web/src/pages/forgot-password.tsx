@@ -9,7 +9,6 @@ import { useForgotPasswordMutation } from "../generated/graphql";
 import {
   Alert,
   AlertIcon,
-  AlertTitle,
   AlertDescription,
   CloseButton,
 } from "@chakra-ui/react";
