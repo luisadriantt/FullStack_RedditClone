@@ -7,21 +7,20 @@ import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 import NextLink from "next/link";
+import { withApollo } from "../utils/withApollo";
 
 // In Next js the name of the files inside pages will be routes
 const Login: React.FC<{}> = ({}) => {
   const router = useRouter();
-  const [, login] = useLoginMutation(); // first parameter is info about mutation, second is the funtion name
+  const [login] = useLoginMutation(); // first parameter is info about mutation, second is the funtion name
 
   return (
     <Wrapper variant="small">
       <Formik
         initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await login(values);
+          const response = await login({ variables: values });
           // response.data.register.errors -> if there is no data will throw an error (break the app)
           // response.data?.register.errors -> if ther is no data will throw undefine
           // optional chaining from typescript
@@ -74,4 +73,4 @@ const Login: React.FC<{}> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(Login);
+export default withApollo({ ssr: false })(Login);

@@ -13,8 +13,8 @@ export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
   postId,
   creatorId,
 }) => {
-  const [{ data: meData }] = useMeQuery();
-  const [, deletePost] = useDeletePostMutation();
+  const { data: meData } = useMeQuery();
+  const [deletePost] = useDeletePostMutation();
 
   if (meData?.me?._id !== creatorId) {
     return null;
@@ -29,7 +29,7 @@ export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
         aria-label="Delete post"
         icon={<DeleteIcon />}
         onClick={async () => {
-          await deletePost({ id: postId });
+          await deletePost({ variables: { id: postId } });
           router.push("/");
         }}
       />

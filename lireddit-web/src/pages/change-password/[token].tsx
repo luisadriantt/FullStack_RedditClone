@@ -19,12 +19,11 @@ import { InputField } from "../../components/InputField";
 import { Wrapper } from "../../components/Wrapper";
 import { useChangePasswordMutation } from "../../generated/graphql";
 import { toErrorMap } from "../../utils/toErrorMap";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../../utils/createUrqlClient";
+import { withApollo } from "../../utils/withApollo";
 
 const ChangePassword: NextPage = () => {
   const router = useRouter();
-  const [, changePasword] = useChangePasswordMutation();
+  const [changePasword] = useChangePasswordMutation();
   const [tokenError, setTokenError] = useState("");
   const invalidPass = [
     {
@@ -43,8 +42,10 @@ const ChangePassword: NextPage = () => {
             return;
           }
           const response = await changePasword({
-            newPassword: values.newPassword,
-            token: router.query.token === "string" ? router.query.token : "",
+            variables: {
+              newPassword: values.newPassword,
+              token: router.query.token === "string" ? router.query.token : "",
+            },
           });
           // // response.data.register.errors -> if there is no data will throw an error (break the app)
           // // response.data?.register.errors -> if ther is no data will throw undefine
@@ -105,4 +106,4 @@ const ChangePassword: NextPage = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: false })(ChangePassword);
+export default withApollo({ ssr: false })(ChangePassword);
